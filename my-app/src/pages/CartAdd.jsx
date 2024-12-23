@@ -16,7 +16,7 @@ const CartAdd = () => {
     const fetchProductDetails = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`https://hosteecommerce.vercel.app/product/${id}`);
+        const response = await axios.get(`https://ecommercebackend-liq0.onrender.com/product/${id}`);
         if (response.data.success) {
           setProduct(response.data.product);
         } else {

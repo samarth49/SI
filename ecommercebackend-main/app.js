@@ -13,14 +13,13 @@ const cartRoutes = require('./routes/cart');
 const complaintsRoutes = require('./routes/complaints');
 const couponRoutes = require('./routes/coupon')
 const Product = require('./models/product');
-const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000','https://merabestie.com','https://hosteecommerce.vercel.app'], 
+  origin: [' http://localhost:5173', 'http://localhost:3000','https://merabestie-orpin.vercel.app','https://merabestie-khaki.vercel.app','https://merabestie.com','https://hosteecommerce.vercel.app'], // Frontend URLs
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -32,11 +31,11 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   session({
-    secret: crypto.randomBytes(64).toString('hex'),
+    secret: "a57cb2f7c4a1ef3a8a3c6a5bf213d998812de8fc7bb47da8b7347a92f9ec48d9",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,
+      mongoUrl: "mongodb+srv://ecommerce:ecommerce@ecommerce.dunf0.mongodb.net/",
       collectionName: 'sessions',
     }),
     cookie: {
@@ -55,8 +54,11 @@ app.use('/complaints', complaintsRoutes);
 app.use('/coupon',couponRoutes)
 
 // MongoDB Connection
-const uri = process.env.MONGO_URI;
-mongoose.connect(uri)
+const uri = "mongodb+srv://ecommerce:ecommerce@ecommerce.dunf0.mongodb.net/";
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
@@ -80,7 +82,10 @@ app.post('/product/category', async (req, res) => {
 
     // Map normalized categories to their proper display versions
     switch(normalizedCategory) {
-      case 'gift-boxes':
+      case 'Kids Clothing':
+        searchCategory='Kids clothing';
+        break;
+       
       case 'gift boxes':
         searchCategory = 'Gift Boxes';
         break;
@@ -90,6 +95,11 @@ app.post('/product/category', async (req, res) => {
       case 'stationery':
         searchCategory = 'Stationery';
         break;
+
+      case 'electornics':
+        searchCategory = 'Electornics';
+        break;
+      
       default:
         searchCategory = category;
     }
@@ -239,22 +249,20 @@ app.get('/product/:productId', async (req, res) => {
 });
 
 // Update Stock Status Route
-app.put('/instock-update', async (req, res) => {
+app.post('/instock-update', async (req, res) => {
   try {
-    const { productId, price, name, category, inStockValue, soldStockValue } = req.body;
+    const { productId, inStockValue, soldStockValue } = req.body;
+
     // Find and update the product
     const updatedProduct = await Product.findOneAndUpdate(
-      { productId: productId }, // Match by productId
+      { productId: productId },
       {
         $set: {
-          name: name,
-          price: price,
-          category: category,
           inStockValue: inStockValue,
           soldStockValue: soldStockValue
         }
       },
-      { new: true, upsert: false } // Return the updated document
+      { new: true, upsert: false }
     );
 
     if (!updatedProduct) {
@@ -267,11 +275,9 @@ app.put('/instock-update', async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Stock status updated successfully',
-      product: updatedProduct // Include updated product in response for verification
     });
 
   } catch (error) {
-    // Log the error
     res.status(500).json({
       success: false,
       message: 'Error updating stock status',

@@ -17,7 +17,7 @@ const ProductDetails = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(`http://localhost:5000/product/${id}`);
+        const response = await axios.get(`https://hosteecommerce.vercel.app/product/${id}`);
         if (response.data.success) {
           setProduct(response.data.product);
         } else {

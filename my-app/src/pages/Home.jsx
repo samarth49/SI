@@ -35,7 +35,7 @@ const Home = () => {
 
     const fetchProducts = async (category) => {
         try {
-            const response = await axios.post("http://localhost:5000/product/category", { category });
+            const response = await axios.post("https://hosteecommerce.vercel.app/product/category", { category });
             if (response.data.success) {
                 return response.data.products;
             } else {

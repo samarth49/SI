@@ -17,7 +17,7 @@ const ProductDetails = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(`https://ecommercebackend-liq0.onrender.com/product/${id}`);
+        const response = await axios.get(`https://ecommercebackend1-0s99.onrender.com/product/${id}`);
         if (response.data.success) {
           setProduct(response.data.product);
         } else {
